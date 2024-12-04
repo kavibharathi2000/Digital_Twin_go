@@ -41,10 +41,9 @@ func env_test(){
         fmt.Println(documents)
     }
     name := "Kavi"
-    password := "mcw@123"
     role := "read"
     db := "digital_twin"
-    gen_token , err := token.Generate_Token(name, password, role, db)
+    gen_token , err := token.Generate_Token(name, role, db)
     if err != nil{
             fmt.Print(err)
     }else {
