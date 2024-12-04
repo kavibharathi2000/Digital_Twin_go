@@ -66,7 +66,11 @@ func env_test(){
   insertedId: ObjectId('67499573de39ae54d7e9496a')
 }
 */
-// api part starts
+// API part 
+
+
+// login function - { check the user and password and generate the Token }
+
 type login_data struct{
     Username string  `json:"username"`
     Password string `json:"password" `
@@ -85,20 +89,38 @@ func login(c *gin.Context){
     // geting the data from datbase using name
     user_data_db, err  := db.Get_data_by_username(user_data.Username, db_con)
     if err != nil{
-        fmt.Println("There is an ERROR: ",err)
-        // have to create an return statement
+        // there is not user found in the db
+        fmt.Println("[*] There username not found in db : ",user_data.Username)
+        c.JSON(http.StatusNotFound,gin.H{"message":"No User found..!"})
+    }else{
+        // have to check the password
+        if user_data_db.Password == user_data.Password{
+            // have to generate the token
+            token_data , err := token.Generate_Token(user_data.Username , user_data_db.Role, user_data_db.DB)
+            if err != nil{
+                fmt.Println("[*] Error in token Generation :", err)
+                c.JSON(http.StatusInternalServerError, gin.H{"message":"There is an Internal Error. Please try after Sometime "})
+            }else{
+                fmt.Println("[*] The Token has been Generated :",token_data)
+                c.JSON(http.StatusOK , gin.H{"message":"Loged in successfully", "Token":token_data})
+            }
+        }else{
+            fmt.Println("[*] The password does not match with password in the db :",user_data.Username)
+            c.JSON(http.StatusUnauthorized, gin.H{"message":"Incorrect password "})
+        }
     }
-	fmt.Println(user_data_db)
-    // checking the password
-    
-    // if the user name and passwords matchs our database then have to generate the token and return it
-    // if the password doesnt math with user name handle it
-    // if the user is not in the data handle it
-    c.JSON(http.StatusOK, gin.H{
-        "message":  "Login successful",
-        "username": user_data.Username,
-    })
+//  c.JSON(http.StatusOK, gin.H{
+//      "message":  "Login successful",
+//      "username": user_data.Username,
+//  })
 }
+
+
+
+
+
+
+
 func main(){
     env_test()
     router := gin.Default()

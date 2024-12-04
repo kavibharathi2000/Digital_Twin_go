@@ -8,15 +8,13 @@ import (
 var secret_key = []byte("kavi@123")
 type token_data struct{
     Username string `json:"username"`
-    Password string `json:"password"`
     Role string `json:"role"`
     DB string   `json:"db"`
     jwt.RegisteredClaims
 }
-func Generate_Token(user string , password string , role string, db string)(string, error){
+func Generate_Token(user string ,  role string, db string)(string, error){
     token_claims := token_data{
         Username: user,
-        Password: password,
         Role: role,
         DB: db,
         RegisteredClaims:jwt.RegisteredClaims{
